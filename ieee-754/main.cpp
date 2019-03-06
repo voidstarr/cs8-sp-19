@@ -1,58 +1,82 @@
 #include <cmath>
 #include <iostream>
+#include <sstream>
 #include <vector>
 using namespace std;
 
+string decToBin(int);
+string decToBinFractional(float partRightOfDecimal, int lhsSize);
+
 int main() {
-  float num;
-  cout << "Input num: ";
-  cin >> num;
+  while (1) {
+    float num;
+    int partLeftOfDecimal;
+    float partRightOfDecimal, intPartTmp;
+    vector<int> binaryPartRightOfDecimal;
+    vector<int> binaryPartLeftOfDecimal;
+    float partRightPlaceHolder;
+    stringstream result;
+    string leftPartBinary, rightPartBinary;
+    string exponent;
+    bool positive;
 
-  int partLeftOfDecimal;
-  float partRightOfDecimal, intPartTmp;
+    cout << "Input num: ";
+    cin >> num;
 
-  partRightOfDecimal = modf(num, &intPartTmp);
-  partLeftOfDecimal = intPartTmp;
+    positive = num > 0;
+    if (!positive)
+      num *= -1;
+    partRightOfDecimal = modf(num, &intPartTmp);
+    partLeftOfDecimal = intPartTmp;
 
-  cout << "right : " << partRightOfDecimal << " left: " << partLeftOfDecimal
-       << endl;
+    leftPartBinary = decToBin(partLeftOfDecimal);
+    rightPartBinary =
+        decToBinFractional(partRightOfDecimal, leftPartBinary.length());
+    exponent = decToBin(leftPartBinary.length() - 1);
 
-  vector<int> binaryPartRightOfDecimal;
-  vector<int> binaryPartLeftOfDecimal;
+    for (int i = exponent.length(); i < 8; i++) {
+      exponent = ('0' + exponent);
+    }
 
-  while (partLeftOfDecimal != 0) {
-    binaryPartLeftOfDecimal.push_back(partLeftOfDecimal % 2);
-    partLeftOfDecimal /= 2;
-    // cout << partLeftOfDecimal << endl;
+    result << (positive ? '0' : '1') << exponent
+           << leftPartBinary.substr(1, leftPartBinary.size() - 1)
+           << rightPartBinary;
+
+    cout << result.str() << endl;
+    cout << "^^       ^" << endl
+         << "||       |-mantissa" << endl
+         << "|- exponent" << endl
+         << "-sign" << endl;
   }
+}
 
-  // cout << "above for loop" << endl;
-  for (int i = binaryPartLeftOfDecimal.size() - 1; i >= 0; i--) {
-    //  cout << "in loop" << endl;
-    cout << binaryPartLeftOfDecimal[i];
-  }
-
-  cout << '.';
-
-  int asdf = 1;
-  float tmp;
-  while (
-      (binaryPartRightOfDecimal.size() + binaryPartLeftOfDecimal.size() < 24)) {
-    //    cout << "partRightOfDecimal "<<partRightOfDecimal;
-
-    tmp = partRightOfDecimal * 2;
-    if (tmp >= 1) {
-      binaryPartRightOfDecimal.push_back(int(tmp));
-      partRightOfDecimal = tmp - 1;
+string decToBinFractional(float partRightOfDecimal, int lhsSize) {
+  stringstream result;
+  float partRightPlaceHolder;
+  while (lhsSize + result.tellp() < 24) {
+    partRightPlaceHolder = partRightOfDecimal * 2;
+    if (partRightPlaceHolder >= 1) {
+      result << int(partRightPlaceHolder);
+      partRightOfDecimal = partRightPlaceHolder - 1;
     } else {
-      binaryPartRightOfDecimal.push_back(int(tmp));
-      partRightOfDecimal = tmp;
+      result << int(partRightPlaceHolder);
+      partRightOfDecimal = partRightPlaceHolder;
     }
   }
 
-  for (int i = 0; i < binaryPartRightOfDecimal.size(); i++) {
-    cout << binaryPartRightOfDecimal[i];
-  }
+  return result.str();
+}
 
-  cout << endl;
+string decToBin(int i) {
+  vector<int> bitHolder;
+  stringstream result;
+  do {
+    bitHolder.push_back(i % 2);
+    i /= 2;
+  } while (i != 0);
+
+  for (int i = bitHolder.size() - 1; i >= 0; i--) {
+    result << bitHolder[i];
+  }
+  return result.str();
 }
