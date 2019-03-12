@@ -32,7 +32,7 @@ int main() {
     leftPartBinary = decToBin(partLeftOfDecimal);
     rightPartBinary =
         decToBinFractional(partRightOfDecimal, leftPartBinary.length());
-    exponent = decToBin(leftPartBinary.length() - 1);
+    exponent = decToBin(leftPartBinary.length() - 1 + 127);
 
     for (int i = exponent.length(); i < 8; i++) {
       exponent = ('0' + exponent);
